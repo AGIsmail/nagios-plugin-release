@@ -1,0 +1,22 @@
+#!/bin/sh
+## Debian check tool to see if apt-get upgrade is needed or not
+## (c) 2017 by Ahmed Ismail <aismail@auto.tuwien.ac.at>
+## v0.01
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then
+	echo "Simple script to check the Debian Distribution Version and Release"
+else
+	UNAME=/bin/uname
+	LSBRELEASE=/usr/bin/lsb_release
+	UNAME_OUTPUT=$( $UNAME -a )
+	LSBRELEASE_OUTPUT=$( $LSBRELEASE -d | awk '{$1=""; print $0}' )
+        RELEASE_VERSION=$( echo "$LSBRELEASE_OUTPUT" | awk '{print $3}' )
+        CMP_RESULT=$( echo "$RELEASE_VERSION < 8.9" | bc -l)
+        if [ "$CMP_RESULT" -eq 1 ]; then
+            echo "RELEASE CRITICAL: Outdated distribution release - $LSBRELEASE_OUTPUT $UNAME_OUTPUT"
+            exit 2
+        else
+	    echo "RELEASE OK: $LSBRELEASE_OUTPUT $UNAME_OUTPUT"
+	    exit 0
+        fi
+fi
